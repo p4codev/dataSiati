@@ -1,0 +1,30 @@
+Sobre la base de datos:
+
+¿Qué motor de base de datos usa OCS Inventory? 
+si estoy usando mysql
+¿Tienes las credenciales de conexión?
+si exactamente tengo las credenciales
+¿La BD está en el mismo servidor o en otro?
+si la tengo en mi misma computadora como local
+
+Sobre los datos a extraer:
+
+¿Qué información específica necesitas? 
+
+la informacion que necesito seria el nombre de usuario del dispositivo. tipo del dispositivo, el fabricante del dispocitivo, el modelo del dispistivo, el numero de serie del dispositivo, si a ese dispositivo esta conectado un monitor o mas necesito, su marca su indetificador y su numero de serie e igualmente lo mismo si tiene su teclado y mouse 
+
+Sobre la plantilla Excel:
+
+¿Podrías compartir la plantilla o describir su estructura?
+te comparto la plantilla
+¿En qué celdas específicas va cada tipo de dato?
+ve algunas celdas pero dame el ejemplo y puedo ir colocando en que celda va
+¿Es una plantilla por equipo o un listado de múltiples equipos?
+es una plantilla por usuario 
+
+Herramientas:
+¿Qué lenguaje prefieres?
+al momento ya tengo un ambiente en python instalado panda mysql-conecion y otras dependencias
+¿Necesitas que sea automático o manual?
+quiero que sea automatico ya que debo tener un excel por cada usuario
+
