@@ -45,6 +45,7 @@ class OCSInventoryToExcel:
             b.SMANUFACTURER as manufacturer,
             b.SMODEL as model,
             b.SSN as serial_number,
+            b.TYPE as dev_type,
             h.ID as hardware_id
         FROM hardware h
         LEFT JOIN bios b ON h.ID = b.HARDWARE_ID
@@ -165,12 +166,16 @@ class OCSInventoryToExcel:
             
             # Columnas de la tabla de equipos (estimadas, necesitan confirmación)
             worksheet[f'A{equipment_row}'] = '1'  # Número
+            #worksheet[f'B{equipment_row}'] = device_data.get('dev_type', '')  # Tipo
             worksheet[f'B{equipment_row}'] = self.determine_equipment_type(device_data)  # Descripción/Tipo
             worksheet[f'H{equipment_row}'] = 'En funcionamiento / Regular'  # Estado
             worksheet[f'K{equipment_row}'] = device_data.get('manufacturer', '')  # Marca
             worksheet[f'M{equipment_row}'] = device_data.get('model', '')  # Modelo
             worksheet[f'O{equipment_row}'] = device_data.get('serial_number', '')  # Serie
             
+            
+
+
             # Agregar monitores como equipos adicionales
             current_row = equipment_row + 1
             monitors = device_data.get('monitors', [])
@@ -229,20 +234,17 @@ class OCSInventoryToExcel:
         except Exception as e:
             print(f"Error creando acta para {device_data.get('username', 'usuario')}: {e}")
     
+    
     def determine_equipment_type(self, device_data):
-        """Determina el tipo de equipo basado en el OS"""
-        os_name = device_data.get('device_type', '').lower()
-        if 'windows' in os_name:
-            if 'server' in os_name:
-                return 'Servidor'
-            else:
-                return 'PC Escritorio/Laptop'
-        elif 'linux' in os_name:
-            return 'Estación Linux'
-        elif 'mac' in os_name:
-            return 'Mac'
+        """Determina el tipo de equipo basado en el tipo de dispositivo"""
+        os_name = device_data.get('dev_type', '').lower()
+        if 'desktop' in os_name:
+            return 'CPU'
+        elif 'notebook' in os_name:
+            return 'Laptop'
         else:
             return 'Equipo Informático'
+
     
     def generate_all_excel_files(self, output_folder="output_inventarios"):
         """
