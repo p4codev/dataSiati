@@ -80,6 +80,8 @@ class OCSInventoryToExcel:
             SERIAL as serial_number
         FROM monitors 
         WHERE HARDWARE_ID = %s
+        AND SERIAL IS NOT NULL 
+        AND SERIAL != ''
         """
         
         try:
@@ -95,11 +97,12 @@ class OCSInventoryToExcel:
         """Obtiene información de teclados conectados"""
         query = """
         SELECT 
-            NAME as brand,
+            TYPE as brand,
             DESCRIPTION as identifier,
             '' as serial_number
         FROM inputs 
         WHERE HARDWARE_ID = %s AND TYPE = 'Keyboard'
+        LIMIT 1
         """
         
         try:
@@ -115,11 +118,12 @@ class OCSInventoryToExcel:
         """Obtiene información de mouse conectados"""
         query = """
         SELECT 
-            NAME as brand,
+            TYPE as brand,
             DESCRIPTION as identifier,
             '' as serial_number
         FROM inputs 
-        WHERE HARDWARE_ID = %s AND TYPE = 'Mouse'
+        WHERE HARDWARE_ID = %s AND TYPE = 'Pointing'
+        LIMIT 1
         """
         
         try:
@@ -185,7 +189,7 @@ class OCSInventoryToExcel:
             for i, keyboard in enumerate(keyboards):
                 if current_row <= equipment_row + 10:
                     worksheet[f'A{current_row}'] = str(current_row - equipment_row + 1)
-                    worksheet[f'C{current_row}'] = 'Teclado'
+                    worksheet[f'B{current_row}'] = 'Teclado'
                     worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
                     worksheet[f'K{current_row}'] = keyboard.get('brand', '')
                     worksheet[f'M{current_row}'] = keyboard.get('identifier', '')
@@ -197,7 +201,7 @@ class OCSInventoryToExcel:
             for i, mouse in enumerate(mice):
                 if current_row <= equipment_row + 10:
                     worksheet[f'A{current_row}'] = str(current_row - equipment_row + 1)
-                    worksheet[f'C{current_row}'] = 'Mouse'
+                    worksheet[f'B{current_row}'] = 'Mouse'
                     worksheet[f'H{current_row}'] = 'En funcionamiento'
                     worksheet[f'K{current_row}'] = mouse.get('brand', '')
                     worksheet[f'M{current_row}'] = mouse.get('identifier', '')
