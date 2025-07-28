@@ -63,7 +63,11 @@ class OCSInventoryToExcel:
             for device in devices:
                 device['monitors'] = self.get_monitors(device['hardware_id'])
                 device['keyboards'] = self.get_keyboards(device['hardware_id'])
-                device['mice'] = self.get_mice(device['hardware_id'])
+                device['mice'] = self.get_mice(device['hardware_id'])                
+                empleado = self.get_empleado(device['hardware_id'])
+                if empleado and isinstance(empleado, list) and len(empleado) > 0:
+                    device.update(empleado[0])
+                
             
             print(f"Se encontraron {len(devices)} dispositivos")
             return devices
@@ -93,6 +97,35 @@ class OCSInventoryToExcel:
             return monitors
         except:
             return []
+        
+    
+
+
+    def get_empleado(self, hardware_id):
+        """Obtiene información de empleado"""
+        query = """
+        SELECT 
+	        EMPRESA as empresa_usuario,
+            DEPARTAMENTO as departamento_usuario,
+            NOMBRE as nombre_completo,
+            CARGO as cargo_usuario,
+            CIUDAD as ciudad_usuario
+        FROM usuarios 
+        WHERE HARDWARE_ID = %s;
+        """
+        
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            cursor.execute(query, (hardware_id,))
+            empleado = cursor.fetchall()
+            cursor.close()
+            return empleado
+        except:
+            return []
+
+
+
+
     
     def get_keyboards(self, hardware_id):
         """Obtiene información de teclados conectados"""
@@ -151,10 +184,18 @@ class OCSInventoryToExcel:
             
             # Basándome en la plantilla PDF, necesito que me confirmes las celdas exactas
             # Datos del colaborador que recibe
-            worksheet['D11'] = device_data.get('username', '')  # Nombre del colaborador
-            worksheet['D9'] = 'Alexander Coral'  # Colaborador quien entrega
+            worksheet['D11'] = device_data.get('nombre_completo', '')  # Nombre del colaborador
+            worksheet['D9'] = 'ALEXANDER CORAL'  # Colaborador quien entrega
             worksheet['H15'] = 'X'  # Colaborador quien entrega
-            worksheet['L15'] = 'Actualizacion de Equipos del Colaborador'  # Colaborador quien entrega
+            worksheet['L15'] = 'Actualización de Equipos del Colaborador'  # Colaborador quien entrega
+            worksheet['D7'] = device_data.get('departamento_usuario', '')  # 
+            worksheet['Q11'] = device_data.get('empresa_usuario', '')  #   
+
+            # Crear apartado de Entregue Conforme y Recibi Conforme
+            worksheet['G56'] = 'ALEXANDER CORAL'  # Colaborador quien entrega
+            worksheet['G57'] = 'SOPORTE TI'  # Colaborador quien entrega
+            worksheet['L56'] = device_data.get('nombre_completo', '') # 
+            worksheet['L57'] = device_data.get('cargo_usuario', '')  #      
             
             # Fecha actual
             worksheet['R7'] = datetime.now().strftime('%d-%m-%Y')  # Fecha
@@ -173,8 +214,6 @@ class OCSInventoryToExcel:
             worksheet[f'M{equipment_row}'] = device_data.get('model', '')  # Modelo
             worksheet[f'O{equipment_row}'] = device_data.get('serial_number', '')  # Serie
             
-            
-
 
             # Agregar monitores como equipos adicionales
             current_row = equipment_row + 1
@@ -212,20 +251,29 @@ class OCSInventoryToExcel:
                     worksheet[f'M{current_row}'] = mouse.get('identifier', '')
                     worksheet[f'O{current_row}'] = mouse.get('serial_number', 'N/A')                    
                     current_row += 1
-            
 
-            # Crear apartado de Entregue Conforme y Recibi Conforme
-            worksheet['G56'] = 'Alexander Coral'  # Colaborador quien entrega
-            worksheet['G57'] = 'SOPORTE TI'  # Colaborador quien entrega
-            worksheet['L56'] =  device_data.get('username', '') # Colaborador quien recibe
             
             
             
-            # Crear nombre de archivo seguro
+            
+            """# Crear nombre de archivo seguro
             username = device_data.get('username', 'Usuario_Desconocido')
             safe_filename = "".join(c for c in username if c.isalnum() or c in (' ', '-', '_')).rstrip()
             filename = f"Entrega_{safe_filename}.xlsx"
-            filepath = os.path.join(output_folder, filename)
+            filepath = os.path.join(output_folder, filename)"""
+
+            # Crear nombre de archivo seguro
+            ciudad = device_data.get('ciudad_usuario', 'SinCiudad')
+            safe_ciudad = "".join(c for c in ciudad if c.isalnum() or c in (' ', '-', '_')).rstrip()
+            ciudad_folder = os.path.join(output_folder, safe_ciudad)
+            if not os.path.exists(ciudad_folder):
+                os.makedirs(ciudad_folder)
+            
+            username = device_data.get('username', 'Usuario_Desconocido')
+            safe_filename = "".join(c for c in username if c.isalnum() or c in (' ', '-', '_')).rstrip()
+            filename = f"Entrega_{safe_filename}.xlsx"
+            filepath = os.path.join(ciudad_folder, filename)
+
             
             # Guardar el archivo
             workbook.save(filepath)
