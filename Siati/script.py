@@ -221,7 +221,7 @@ class OCSInventoryToExcel:
             for i, monitor in enumerate(monitors):
                 if current_row <= equipment_row + 10:  # Limitar a 10 filas adicionales
                     worksheet[f'A{current_row}'] = str(i + 2)
-                    worksheet[f'B{current_row}'] = 'Monitor'
+                    worksheet[f'B{current_row}'] = 'MONITOR'
                     worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
                     worksheet[f'K{current_row}'] = monitor.get('brand', '')
                     worksheet[f'M{current_row}'] = monitor.get('identifier', '')
@@ -233,7 +233,7 @@ class OCSInventoryToExcel:
             for i, keyboard in enumerate(keyboards):
                 if current_row <= equipment_row + 10:
                     worksheet[f'A{current_row}'] = str(current_row - equipment_row + 1)
-                    worksheet[f'B{current_row}'] = 'Teclado'
+                    worksheet[f'B{current_row}'] = 'TECLADO'
                     worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
                     worksheet[f'K{current_row}'] = keyboard.get('brand', '')
                     worksheet[f'M{current_row}'] = keyboard.get('identifier', '')
@@ -245,22 +245,38 @@ class OCSInventoryToExcel:
             for i, mouse in enumerate(mice):
                 if current_row <= equipment_row + 10:
                     worksheet[f'A{current_row}'] = str(current_row - equipment_row + 1)
-                    worksheet[f'B{current_row}'] = 'Mouse'
-                    worksheet[f'H{current_row}'] = 'En funcionamiento'
+                    worksheet[f'B{current_row}'] = 'MOUSE'
+                    worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
                     worksheet[f'K{current_row}'] = mouse.get('brand', '')
                     worksheet[f'M{current_row}'] = mouse.get('identifier', '')
                     worksheet[f'O{current_row}'] = mouse.get('serial_number', 'N/A')                    
                     current_row += 1
 
+
+            # Datos UPS
+            worksheet[f'B{current_row}'] = 'UPS'
+            worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
+            worksheet[f'K{current_row}'] = 'Forza'
+            current_row += 1
             
+            # Datos Teléfono
+            worksheet[f'B{current_row}'] = 'TELEFONO'
+            worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
+            worksheet[f'K{current_row}'] = 'Grand Stream'
+            current_row += 1
             
+            # Datos Base laptop
+            worksheet[f'B{current_row}'] = 'BASE LAPTOP'
+            worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
+            worksheet[f'K{current_row}'] = 'Marca Base Laptop'
+            current_row += 1
             
+            # Datos Mochila
+            worksheet[f'B{current_row}'] = 'MOCHILA'
+            worksheet[f'H{current_row}'] = 'En funcionamiento / Regular'
+            worksheet[f'K{current_row}'] = 'Quasad'
+            current_row += 1          
             
-            """# Crear nombre de archivo seguro
-            username = device_data.get('username', 'Usuario_Desconocido')
-            safe_filename = "".join(c for c in username if c.isalnum() or c in (' ', '-', '_')).rstrip()
-            filename = f"Entrega_{safe_filename}.xlsx"
-            filepath = os.path.join(output_folder, filename)"""
 
             # Crear nombre de archivo seguro
             ciudad = device_data.get('ciudad_usuario', 'SinCiudad')
@@ -271,7 +287,13 @@ class OCSInventoryToExcel:
             
             username = device_data.get('username', 'Usuario_Desconocido')
             safe_filename = "".join(c for c in username if c.isalnum() or c in (' ', '-', '_')).rstrip()
-            filename = f"Entrega_{safe_filename}.xlsx"
+            #filename = f"Entrega_{safe_filename}.xlsx"
+
+            nombre_completo = device_data.get('nombre_completo', 'Usuario_Desconocido')
+            safe_nombre = "".join(c for c in nombre_completo if c.isalnum() or c in (' ', '-', '_')).rstrip()
+            filename = f"{safe_nombre}_{safe_filename}.xlsx"
+
+
             filepath = os.path.join(ciudad_folder, filename)
 
             
@@ -289,7 +311,7 @@ class OCSInventoryToExcel:
         if 'desktop' in os_name:
             return 'CPU'
         elif 'notebook' in os_name:
-            return 'Laptop'
+            return 'LAPTOP'
         else:
             return 'Equipo Informático'
 
